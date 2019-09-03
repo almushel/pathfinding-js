@@ -21,7 +21,7 @@ window.onload = function() {
     ctx = canvas.getContext('2d');
     initMouse();
     generateGrid();
-    breadthFirstSearch(pathStart, grid);
+    //breadthFirstSearch(pathStart, grid);
     update();
 }
 
@@ -61,7 +61,7 @@ function breadthFirstSearch(start, graph) {
 
     while (frontier.length > 0) {
         let current = frontier[0],
-            currentNeighbors = getNeighbors(current, graph);
+            currentNeighbors = getNeighbors(current, graph, false);
 
         for (let i = 0; i < currentNeighbors.length; i++) {
             if (cameFrom[currentNeighbors[i]] === -1) {
@@ -73,7 +73,34 @@ function breadthFirstSearch(start, graph) {
     }
 }
 
-function getPath(goal, start, searchGraph) {
+function earlyExitBF(start, goal, graph) {
+    let frontier = [];
+    frontier.push(start);
+
+    //let cameFrom = [];
+    cameFrom.length = graph.length;
+    cameFrom.fill(-1);
+    cameFrom[start] = null;
+
+    while (frontier.length > 0) {
+        let current = frontier[0],
+            currentNeighbors = getNeighbors(current, graph, false);
+
+        if (current == goal) break;
+
+        for (let i = 0; i < currentNeighbors.length; i++) {
+            if (cameFrom[currentNeighbors[i]] === -1) {
+                frontier.push(currentNeighbors[i]);
+                cameFrom[currentNeighbors[i]] = current;
+            }
+        }
+        frontier.shift();
+    }
+
+    return getPath(start, goal, cameFrom);
+}
+
+function getPath(start, goal, searchGraph) {
     let current = goal;
         path = [];
 
@@ -86,24 +113,27 @@ function getPath(goal, start, searchGraph) {
     return path;
 }
 
-function getNeighbors(index, grid) {
+function getNeighbors(index, grid, diagonal) {
     let neighbors = [];
 
-    //One tile to the left
-    if ((index % GRID_COLS) - 1 >= 0) {
-        neighbors.push(index - 1);
-    }
-    //One row above
-    if (index - GRID_COLS >= 0) {
-        neighbors.push(index - GRID_COLS)
-    }
-    //One tile to the right
-    if ((index % GRID_COLS) + 1 < GRID_COLS) {
-            neighbors.push(index + 1);
+    for (let i = -1; i < 2; i++) {
+        for (let e = -1; e < 2; e++) {
+            if (!diagonal && Math.abs(i) == 1 && Math.abs(e) == 1) {
+                continue;
+            }
+
+            let neighbor = index + e + (i * GRID_COLS);
+            if (neighbor < 0 || neighbor > grid.length - 1) {
+                continue;
+            }
+            
+            if (neighbor % GRID_COLS >= 0 && neighbor % GRID_COLS < GRID_COLS && neighbor != index) {
+                if (Math.floor(neighbor / GRID_COLS) == Math.floor(index / GRID_COLS) + i) {
+                    neighbors.push(neighbor);
+                }
+                
+            }
         }
-    //One row below
-    if (index + GRID_COLS < grid.length) {
-        neighbors.push(index + GRID_COLS)
     }
     return neighbors;
 }
@@ -142,7 +172,7 @@ function drawCameFrom() {
             if (cameFrom[index] >= 0 && cameFrom[index] !== null) {
                 ctx.fillStyle = 'green';
                 ctx.fillRect(col * TILE_W + 1, row * TILE_H + 1, TILE_W - 2, TILE_H - 2);
-
+/*
                 ctx.fillStyle = 'yellow';
                 ctx.font = 'Arial 30px';
                 ctx.textAlign = 'center';
@@ -150,6 +180,7 @@ function drawCameFrom() {
                     tY = (row * TILE_H + 1) + (TILE_H - 2) / 2;
     
                 ctx.fillText(cameFrom[index], tX, tY);
+*/
             }
 
             index++;
@@ -194,7 +225,8 @@ function updateMousePos(e) {
     if (draggingStart == true && gIndex != pathStart) {
         pathFound.length = 0;
         pathStart = gIndex;
-        breadthFirstSearch(pathStart, grid);
+        cameFrom.fill(-1);
+        //breadthFirstSearch(pathStart, grid);
     }
 }
 
@@ -220,7 +252,7 @@ function updateMouseup(e) {
             mouseRow = Math.floor(mouseY / TILE_H),
             gIndex = (mouseRow * GRID_COLS) + mouseCol;
     
-        pathFound = getPath(gIndex, pathStart, cameFrom);
+        pathFound = earlyExitBF(pathStart, gIndex, grid);
     }
 
 
