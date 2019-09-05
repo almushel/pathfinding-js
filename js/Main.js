@@ -142,11 +142,69 @@ function uniformCostSearch(start, goal, graph) {
 
 		for (let i = 0; i < currentNeighbors.length; i++) {
 			let neighbor = currentNeighbors[i],
-				newCost = costSoFar[current] + getMoveCost(current, neighbor, grid);
+				newCost = costSoFar[current] + getMoveCost(neighbor, grid);
 
 			if (costSoFar[neighbor] === undefined || newCost < costSoFar[neighbor]) {
 				costSoFar[neighbor] = newCost;
 				let priority = newCost;
+				frontier.insertWithPriority(neighbor, priority);
+				cameFrom[neighbor] = current;
+			}
+		}
+	}
+	return getPath(start, goal, cameFrom);
+}
+
+function greedyBestFirst(start, goal, graph) {
+	let frontier = new PriorityQueue();
+	frontier.insertWithPriority(start, 0);
+
+	cameFrom.length = 0;
+	cameFrom.length = graph.length;
+	cameFrom[start] = null;
+
+	while (!frontier.isEmpty()) {
+		let current = frontier.pullLowestPriority(),
+			currentNeighbors = getNeighborsBF(current, graph, false);
+
+		if (current == goal) break;
+
+		for (let i = 0; i < currentNeighbors.length; i++) {
+			let neighbor = currentNeighbors[i],
+				priority = heuristic(goal, neighbor);
+			if (cameFrom[currentNeighbors[i]] === undefined) {
+				frontier.insertWithPriority(neighbor, priority);
+				cameFrom[neighbor] = current;
+			}
+		}
+	}
+
+	return getPath(start, goal, cameFrom);
+}
+
+function aStarSearch(start, goal, graph) {
+	let frontier = new PriorityQueue();
+	frontier.insertWithPriority(start, 0);
+
+	costSoFar = [];
+	costSoFar[start] = 0;
+	cameFrom.length = graph.length;
+	cameFrom.fill(-1);
+	cameFrom[start] = null;
+
+	while (!frontier.isEmpty()) {
+		let current = frontier.pullLowestPriority(),
+			currentNeighbors = getNeighbors(current, graph, false);
+
+		if (current == goal) break;
+
+		for (let i = 0; i < currentNeighbors.length; i++) {
+			let neighbor = currentNeighbors[i],
+				newCost = costSoFar[current] + getMoveCost(neighbor, grid);
+
+			if (costSoFar[neighbor] === undefined || newCost < costSoFar[neighbor]) {
+				costSoFar[neighbor] = newCost;
+				let priority = newCost + heuristic(goal, neighbor);
 				frontier.insertWithPriority(neighbor, priority);
 				cameFrom[neighbor] = current;
 			}
@@ -217,8 +275,8 @@ function getNeighbors(index, grid, diagonal) {
 	return neighbors;
 }
 
-function getMoveCost(from, to, graph) {
-	switch(graph[to]) {
+function getMoveCost(node, graph) {
+	switch(graph[node]) {
 		case 0:
 			return 1;
 		case 1:
@@ -230,56 +288,16 @@ function getMoveCost(from, to, graph) {
 	}
 }
 
-function initMouse() {
-	canvas.addEventListener('mousemove', updateMousePos)
-	document.addEventListener('mousedown', updateMousedown);
-	document.addEventListener('mouseup', updateMouseup);
+function heuristic(aIndex, bIndex) {
+	let a = indexToColRow(aIndex, GRID_COLS, GRID_ROWS),
+		b = indexToColRow(bIndex, GRID_COLS, GRID_ROWS);
+
+	return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
-function updateMousePos(e) {
-	mouseX = e.clientX - canvas.getBoundingClientRect().left;
-	mouseY = e.clientY - canvas.getBoundingClientRect().top;
+function indexToColRow(index, width, height) {
+	let col = index % width,
+		row = Math.floor(index / height);
 
-	let mouseCol = Math.floor(mouseX / TILE_W),
-		mouseRow = Math.floor(mouseY / TILE_H),
-		gIndex = (mouseRow * GRID_COLS) + mouseCol;
-
-	if (draggingStart == true && gIndex != pathStart) {
-		pathFound.length = 0;
-		pathStart = gIndex;
-		cameFrom.fill(-1);
-		//breadthFirstSearch(pathStart, grid);
-	}
-}
-
-function updateMousedown(e) {
-	mouseHeld = true;
-
-	let mouseCol = Math.floor(mouseX / TILE_W),
-		mouseRow = Math.floor(mouseY / TILE_H),
-		gIndex = (mouseRow * GRID_COLS) + mouseCol;
-
-	if (gIndex == pathStart) {
-		draggingStart = true;
-	}
-}
-
-function updateMouseup(e) {
-	mouseHeld = false;
-
-	if (draggingStart) {
-		draggingStart = false;
-	} else {
-		let mouseCol = Math.floor(mouseX / TILE_W),
-			mouseRow = Math.floor(mouseY / TILE_H),
-			gIndex = (mouseRow * GRID_COLS) + mouseCol;
-		
-		if (grid[gIndex] !== 1) {
-			// pathFound = earlyExitBF(pathStart, gIndex, grid);
-			pathFound = uniformCostSearch(pathStart, gIndex, grid);
-		}
-		
-	}
-
-
+	return {x: row, y: col};
 }

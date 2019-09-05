@@ -15,20 +15,16 @@ class PriorityQueue {
 
     pullHighestPriority() {
         let highest = this.peakHighestPriority(),
-            priorityElement = this.elements[highest];
-        
-        this.deleteElement(highest);
+            priorityElement = this.deleteElement(highest);
 
-        return priorityElement;
+        return priorityElement[0];
     }
 
     pullLowestPriority() {
         let lowest = this.peakLowestPriority(),
-            priorityElement = this.elements[lowest];
-        
-        this.deleteElement(lowest);
-
-        return priorityElement;
+            priorityElement = this.deleteElement(lowest);;
+    
+        return priorityElement[0];
     }
 
     peakHighestPriority() {
@@ -54,7 +50,8 @@ class PriorityQueue {
     }
 
     deleteElement(index) {
-        this.elements.splice(index, 1);
         this.priorities.splice(index, 1);
+    
+        return this.elements.splice(index, 1);
     }
 }
