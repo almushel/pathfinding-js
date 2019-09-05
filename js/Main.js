@@ -13,19 +13,19 @@ let draggingStart = false;
 
 let canvas, ctx,
 	grid = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-			1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 1,
+			1, 0, 0, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 1,
+			1, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 2, 2, 0, 0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 2, 2, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 1,
+			1, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
 			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 	cameFrom = [],
 	pathFound = [];
@@ -34,14 +34,11 @@ window.onload = function () {
 	canvas = document.getElementById('gridCanvas');
 	ctx = canvas.getContext('2d');
 	initMouse();
-	//generateGrid();
-	//breadthFirstSearch(pathStart, grid);
 	update();
 }
 
 function update() {
 	drawGrid();
-
 	drawCameFrom();
 	drawPathFound();
 	drawMouseTile();
@@ -83,14 +80,13 @@ function breadthFirstSearch(start, graph) {
 	let frontier = [];
 	frontier.push(start);
 
-	//let cameFrom = [];
 	cameFrom.length = graph.length;
 	cameFrom.fill(-1);
 	cameFrom[start] = null;
 
 	while (frontier.length > 0) {
 		let current = frontier[0],
-			currentNeighbors = getNeighbors(current, graph, false);
+			currentNeighbors = getNeighborsBF(current, graph, false);
 
 		for (let i = 0; i < currentNeighbors.length; i++) {
 			if (cameFrom[currentNeighbors[i]] === -1) {
@@ -106,14 +102,13 @@ function earlyExitBF(start, goal, graph) {
 	let frontier = [];
 	frontier.push(start);
 
-	//let cameFrom = [];
 	cameFrom.length = graph.length;
 	cameFrom.fill(-1);
 	cameFrom[start] = null;
 
 	while (frontier.length > 0) {
 		let current = frontier[0],
-			currentNeighbors = getNeighbors(current, graph, false);
+			currentNeighbors = getNeighborsBF(current, graph, false);
 
 		if (current == goal) break;
 
@@ -129,6 +124,37 @@ function earlyExitBF(start, goal, graph) {
 	return getPath(start, goal, cameFrom);
 }
 
+function uniformCostSearch(start, goal, graph) {
+	let frontier = new PriorityQueue();
+	frontier.insertWithPriority(start, 0);
+
+	costSoFar = [];
+	costSoFar[start] = 0;
+	cameFrom.length = graph.length;
+	cameFrom.fill(-1);
+	cameFrom[start] = null;
+
+	while (!frontier.isEmpty()) {
+		let current = frontier.pullLowestPriority(),
+			currentNeighbors = getNeighbors(current, graph, false);
+
+		if (current == goal) break;
+
+		for (let i = 0; i < currentNeighbors.length; i++) {
+			let neighbor = currentNeighbors[i],
+				newCost = costSoFar[current] + getMoveCost(current, neighbor, grid);
+
+			if (costSoFar[neighbor] === undefined || newCost < costSoFar[neighbor]) {
+				costSoFar[neighbor] = newCost;
+				let priority = newCost;
+				frontier.insertWithPriority(neighbor, priority);
+				cameFrom[neighbor] = current;
+			}
+		}
+	}
+	return getPath(start, goal, cameFrom);
+}
+
 function getPath(start, goal, searchGraph) {
 	let current = goal;
 	path = [];
@@ -137,12 +163,11 @@ function getPath(start, goal, searchGraph) {
 		path.push(current);
 		current = searchGraph[current];
 	}
-	//path.push(start);
 
 	return path;
 }
 
-function getNeighbors(index, grid, diagonal) {
+function getNeighborsBF(index, grid, diagonal) {
 	let neighbors = [];
 
 	for (let i = -1; i < 2; i++) {
@@ -167,74 +192,42 @@ function getNeighbors(index, grid, diagonal) {
 	return neighbors;
 }
 
-function drawGrid() {
-	ctx.fillStyle = 'dimgrey';
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	let index = 0;
-	for (let row = 0; row < GRID_ROWS; row++) {
-		for (let col = 0; col < GRID_COLS; col++) {
-			if (index == pathStart) {
-				ctx.fillStyle = 'purple';
-				ctx.fillRect(col * TILE_W + 1, row * TILE_H + 1, TILE_W - 2, TILE_H - 2);
-			} else if (grid[index] == 1) {
-				ctx.fillStyle = 'black';
-				ctx.fillRect(col * TILE_W + 1, row * TILE_H + 1, TILE_W - 2, TILE_H - 2);
+function getNeighbors(index, grid, diagonal) {
+	let neighbors = [];
+
+	for (let i = -1; i < 2; i++) {
+		for (let e = -1; e < 2; e++) {
+			if (!diagonal && Math.abs(i) == 1 && Math.abs(e) == 1) {
+				continue;
 			}
 
-			ctx.fillStyle = 'white';
-			ctx.font = 'Arial 30px';
-			ctx.textAlign = 'center';
-			let tX = (col * TILE_W + 1) + (TILE_W - 2) / 2,
-				tY = (row * TILE_H + 1) + (TILE_H - 2) / 2;
-
-			ctx.fillText(index, tX, tY);
-
-			index++;
-		}
-	}
-}
-
-function drawCameFrom() {
-	let index = 0;
-	for (let row = 0; row < GRID_ROWS; row++) {
-		for (let col = 0; col < GRID_COLS; col++) {
-			if (cameFrom[index] >= 0 && cameFrom[index] !== null) {
-				ctx.fillStyle = 'green';
-				ctx.fillRect(col * TILE_W + 1, row * TILE_H + 1, TILE_W - 2, TILE_H - 2);
-				/*
-								ctx.fillStyle = 'yellow';
-								ctx.font = 'Arial 30px';
-								ctx.textAlign = 'center';
-								let tX = (col * TILE_W + 1) + (TILE_W - 2) / 2,
-									tY = (row * TILE_H + 1) + (TILE_H - 2) / 2;
-				    
-								ctx.fillText(cameFrom[index], tX, tY);
-				*/
+			let neighbor = index + e + (i * GRID_COLS);
+			if (neighbor < 0 || neighbor > grid.length - 1) { //) || grid[neighbor] === 1) {
+				continue;
 			}
 
-			index++;
+			if (neighbor % GRID_COLS >= 0 && neighbor % GRID_COLS < GRID_COLS && neighbor != index) {
+				if (Math.floor(neighbor / GRID_COLS) == Math.floor(index / GRID_COLS) + i) {
+					neighbors.push(neighbor);
+				}
+
+			}
 		}
 	}
+	return neighbors;
 }
 
-function drawPathFound() {
-	ctx.fillStyle = 'teal';
-	for (let i = 0; i < pathFound.length; i++) {
-		if (i == 1) {
-			ctx.fillStyle = 'orange';
-		}
-
-		let col = pathFound[i] % GRID_COLS,
-			row = Math.floor(pathFound[i] / GRID_COLS);
-		ctx.fillRect(col * TILE_W, row * TILE_H, TILE_W, TILE_H);
+function getMoveCost(from, to, graph) {
+	switch(graph[to]) {
+		case 0:
+			return 1;
+		case 1:
+			return 100;
+		case 2:
+			return 5;
+		default:
+			return 1;
 	}
-}
-
-function drawMouseTile() {
-	ctx.strokeStyle = 'blue';
-	ctx.beginPath();
-	ctx.rect(mouseX - (mouseX % TILE_W), mouseY - (mouseY % TILE_H), TILE_W, TILE_H);
-	ctx.stroke();
 }
 
 function initMouse() {
@@ -281,8 +274,9 @@ function updateMouseup(e) {
 			mouseRow = Math.floor(mouseY / TILE_H),
 			gIndex = (mouseRow * GRID_COLS) + mouseCol;
 		
-		if (grid[gIndex] == 0) {
-			pathFound = earlyExitBF(pathStart, gIndex, grid);
+		if (grid[gIndex] !== 1) {
+			// pathFound = earlyExitBF(pathStart, gIndex, grid);
+			pathFound = uniformCostSearch(pathStart, gIndex, grid);
 		}
 		
 	}

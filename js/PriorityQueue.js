@@ -45,7 +45,7 @@ class PriorityQueue {
     peakLowestPriority() {
         let lowest = 0;
         for (let i = 0; i < this.priorities.length; i++) {
-            if (this.priorities[i] < priorities[lowest]) {
+            if (this.priorities[i] < this.priorities[lowest]) {
                 lowest = i;
             }
         }
@@ -55,6 +55,6 @@ class PriorityQueue {
 
     deleteElement(index) {
         this.elements.splice(index, 1);
-        this.values.splice(index, 1);
+        this.priorities.splice(index, 1);
     }
 }
