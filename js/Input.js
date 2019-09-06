@@ -1,3 +1,7 @@
+let mouseHeld = false,
+    mouseX = mouseY = null,
+    draggingStart = false;
+
 function initMouse() {
 	canvas.addEventListener('mousemove', updateMousePos)
 	document.addEventListener('mousedown', updateMousedown);
@@ -42,10 +46,10 @@ function updateMouseup(e) {
 			gIndex = (mouseRow * GRID_COLS) + mouseCol;
 		
 		if (grid[gIndex] !== 1) {
-			// pathFound = earlyExitBF(pathStart, gIndex, grid);
-			//pathFound = uniformCostSearch(pathStart, gIndex, grid);
+			//pathFound = earlyExitBF(pathStart, gIndex, grid);
+			pathFound = uniformCostSearch(pathStart, gIndex, grid);
 			//pathFound = greedyBestFirst(pathStart, gIndex, grid);
-			pathFound = aStarSearch(pathStart, gIndex, grid);
+			//pathFound = aStarSearch(pathStart, gIndex, grid);
 		}
 	}
 }
