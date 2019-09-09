@@ -1,10 +1,9 @@
 //Breadth-first
-function breadthFirstSearch(start, graph) {
+function breadthFirstSearch(start, goal, graph) {
 	let frontier = [];
 	frontier.push(start);
 
-	cameFrom.length = graph.length;
-	cameFrom.fill(-1);
+	cameFrom.length = 0;
 	cameFrom[start] = null;
 
 	while (frontier.length > 0) {
@@ -12,13 +11,14 @@ function breadthFirstSearch(start, graph) {
 			currentNeighbors = getNeighborsBF(current, graph, false);
 
 		for (let i = 0; i < currentNeighbors.length; i++) {
-			if (cameFrom[currentNeighbors[i]] === -1) {
+			if (cameFrom[currentNeighbors[i]] === undefined) {
 				frontier.push(currentNeighbors[i]);
 				cameFrom[currentNeighbors[i]] = current;
 			}
 		}
 		frontier.shift();
 	}
+	return getPath(start, goal, cameFrom);
 }
 
 //Early Exit Breadth-first

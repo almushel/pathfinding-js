@@ -13,6 +13,4 @@ function update() {
 	drawGrid();
 	drawCameFrom();
 	drawPathFound();
-	drawMouseTile();
-	requestAnimationFrame(update);
 }
