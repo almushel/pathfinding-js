@@ -47,7 +47,7 @@ function updateMouseup(e) {
 			mouseRow = Math.floor(mouseY / TILE_H),
 			gIndex = (mouseRow * GRID_COLS) + mouseCol;
 
-		if (grid[gIndex] !== 1) {
+		if (gIndex >= 0 && grid[gIndex] !== 1) {
 			switch (currentSearch) {
 				case 1:
 					pathFound = breadthFirstSearch(pathStart, gIndex, grid);

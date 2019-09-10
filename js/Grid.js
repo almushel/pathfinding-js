@@ -102,7 +102,7 @@ function indexToColRow(index, width, height) {
     let col = index % width,
         row = Math.floor(index / height);
 
-    return { x: row, y: col };
+    return { x: col, y: row };
 }
 
 function generateGrid() {
